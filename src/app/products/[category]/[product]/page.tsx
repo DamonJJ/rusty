@@ -4,16 +4,15 @@ import path from 'path'
 import ImageGallery from '@/components/ImageGallery'
 
 interface PageProps {
-  params: {
-    category: string | string[] | undefined
-    product: string | string[] | undefined
-  }
+  params: Promise<{
+    category: string
+    product: string
+  }>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  const category = String(params.category)
-  const product = String(params.product)
-
+  const { category, product } = await params
+  
   // Validate category
   const validCategories = ['snowmobiles', 'trailers']
   if (!validCategories.includes(category)) {

@@ -7,13 +7,13 @@ import Link from 'next/link'
 const validCategories = ['snowmobiles', 'trailers']
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string
-  }
+  }>
 }
 
 export default async function ProductCategoryPage({ params }: PageProps) {
-  const category = await params.category
+  const { category } = await params
 
   if (!validCategories.includes(category)) {
     notFound()
