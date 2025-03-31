@@ -5,14 +5,14 @@ import ImageGallery from '@/components/ImageGallery'
 
 interface PageProps {
   params: {
-    category: string
-    product: string
+    category: string | string[] | undefined
+    product: string | string[] | undefined
   }
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  const category = await params.category
-  const product = await params.product
+  const category = String(params.category)
+  const product = String(params.product)
 
   // Validate category
   const validCategories = ['snowmobiles', 'trailers']
