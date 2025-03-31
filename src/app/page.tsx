@@ -47,12 +47,19 @@ export default function Home() {
   const products = getAllProducts()
 
   return (
-    <main className="min-h-screen p-8 bg-[#f8f5f1]">
+    <main className="min-h-screen p-8">
       {/* Header Section */}
       <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-6xl font-bold mb-4 text-amber-900 rustic-header font-serif">
-          Rusty Nuts
-        </h1>
+        <div className="mb-6">
+          <Image
+            src="/logo.jpg"
+            alt="Rusty Nuts - Small Engine Repair"
+            width={300}
+            height={150}
+            className="mx-auto"
+            priority
+          />
+        </div>
         <p className="text-2xl text-amber-800/80 mb-8 font-medium">
           Small Engine Repair
         </p>
