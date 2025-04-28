@@ -1,6 +1,26 @@
-import { notFound } from 'next/navigation'
 import fs from 'fs'
 import path from 'path'
+
+export async function generateStaticParams() {
+  const productsDir = path.join(process.cwd(), 'public', 'products')
+  const categories = fs.readdirSync(productsDir)
+  let params: { category: string; product: string }[] = []
+
+  for (const category of categories) {
+    const categoryDir = path.join(productsDir, category)
+    if (!fs.statSync(categoryDir).isDirectory()) continue
+    const products = fs.readdirSync(categoryDir)
+    for (const product of products) {
+      const productDir = path.join(categoryDir, product)
+      if (fs.statSync(productDir).isDirectory()) {
+        params.push({ category, product })
+      }
+    }
+  }
+  return params
+}
+
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
 // Validate category parameter

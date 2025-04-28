@@ -1,6 +1,27 @@
-import { notFound } from 'next/navigation'
 import fs from 'fs'
 import path from 'path'
+
+// This function is required for static export!
+export async function generateStaticParams() {
+  const productsDir = path.join(process.cwd(), 'public', 'products')
+  const categories = fs.readdirSync(productsDir)
+  let params: { category: string; product: string }[] = []
+
+  for (const category of categories) {
+    const categoryDir = path.join(productsDir, category)
+    if (!fs.statSync(categoryDir).isDirectory()) continue
+    const products = fs.readdirSync(categoryDir)
+    for (const product of products) {
+      const productDir = path.join(categoryDir, product)
+      if (fs.statSync(productDir).isDirectory()) {
+        params.push({ category, product })
+      }
+    }
+  }
+  return params
+}
+
+import { notFound } from 'next/navigation'
 import ImageGallery from '@/components/ImageGallery'
 
 interface PageProps {
