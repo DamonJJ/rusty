@@ -35,7 +35,10 @@ export default async function ProductPage({ params }: PageProps) {
   const { category, product } = await params
   
   // Validate category
-  const validCategories = ['snowmobiles', 'trailers']
+  const productsDir = path.join(process.cwd(), 'public', 'products')
+  const validCategories = fs.readdirSync(productsDir).filter((file) => {
+    return fs.statSync(path.join(productsDir, file)).isDirectory()
+  })
   if (!validCategories.includes(category)) {
     notFound()
   }
@@ -43,7 +46,7 @@ export default async function ProductPage({ params }: PageProps) {
   // Get product images
   const productPath = path.join(process.cwd(), 'public', 'products', category, product)
   let images: { src: string; alt: string }[] = []
-
+ 
   try {
     const files = fs.readdirSync(productPath)
     images = files
