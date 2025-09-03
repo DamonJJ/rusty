@@ -15,6 +15,8 @@ const eslintConfig = [
     rules: {
       // Allow console statements in development
       "no-console": "off",
+      // Allow img elements for user-uploaded content
+      "@next/next/no-img-element": "off",
       // Allow any type when explicitly needed with comment
       "@typescript-eslint/no-explicit-any": "error",
       // Allow require imports when needed with comment
