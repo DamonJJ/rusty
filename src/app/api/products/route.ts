@@ -49,6 +49,7 @@ export async function GET() {
         const localProducts = JSON.parse(data)
         
         // Convert to database format quickly
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const products = localProducts.map((p: Record<string, any>, index: number) => ({
           id: index + 1,
           name: p.name,
