@@ -3,6 +3,22 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
+interface Product {
+  id: string
+  name: string
+  category: string
+  description?: string
+  price?: string
+  condition?: string
+  year?: string
+  make?: string
+  model?: string
+  images: string[]
+  contactPhone: string
+  contactEmail: string
+  lastUpdated: string
+}
+
 interface PageProps {
   params: Promise<{
     category: string
@@ -23,8 +39,35 @@ export default function ProductCategoryPage({ params }: PageProps) {
         
         setCategory(categoryParam)
         
-        const sheetsClient = new GoogleSheetsClient()
-        const categoryProducts = await sheetsClient.getProductsByCategory(categoryParam)
+        // Fetch products from our API
+        const response = await fetch('/api/products')
+        if (!response.ok) {
+          throw new Error('Failed to fetch products')
+        }
+        
+        const allProducts = await response.json()
+        
+        // Filter products by category and convert to component format
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const categoryProducts = allProducts
+          .filter((p: any) => p.category === categoryParam)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((p: any) => ({
+            id: p.id.toString(),
+            name: p.name,
+            category: p.category,
+            description: p.description,
+            price: p.price?.toString(),
+            condition: p.condition,
+            year: p.year?.toString(),
+            make: p.make,
+            model: p.model,
+            images: p.images || [],
+            contactPhone: p.contact_phone,
+            contactEmail: p.contact_email,
+            lastUpdated: p.updated_at
+          }))
+        
         setProducts(categoryProducts)
       } catch (err) {
         console.error('Error loading products:', err)
@@ -103,7 +146,7 @@ export default function ProductCategoryPage({ params }: PageProps) {
                 </h2>
                 {product.price && (
                   <p className="text-lg font-medium text-green-600 mt-2">
-                    {new GoogleSheetsClient().formatPrice(product.price)}
+                    ${parseFloat(product.price || '0').toLocaleString()}
                   </p>
                 )}
                 {product.year && product.make && (
