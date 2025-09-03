@@ -7,9 +7,10 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
   
-  // Enable experimental features for better performance
+  // Disable problematic optimizations that cause build issues
   experimental: {
-    optimizeCss: true,
+    // Remove CSS optimization that requires 'critters'
+    // optimizeCss: true,
   },
   
   // Environment variables for build
