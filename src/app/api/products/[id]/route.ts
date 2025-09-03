@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Try to import Vercel SQL, but fall back to local database if not available
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let sql: any = null
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const vercelPostgres = require('@vercel/postgres')
   sql = vercelPostgres.sql
-} catch (error) {
+} catch {
   console.log('Vercel Postgres not available, using local database')
 }
 

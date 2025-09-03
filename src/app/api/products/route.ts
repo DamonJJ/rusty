@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAllProducts } from '@/lib/localDatabase'
 
 // Try to import Vercel SQL, but fall back to local database if not available
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let sql: any = null
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const vercelPostgres = require('@vercel/postgres')
   sql = vercelPostgres.sql
-} catch (error) {
+} catch {
   console.log('Vercel Postgres not available, using local database')
 }
 
@@ -36,7 +38,9 @@ export async function GET() {
     
     // Final fallback - try to read the JSON file directly
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs')
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const path = require('path')
       const DB_PATH = path.join(process.cwd(), 'public', 'data', 'products.json')
       
@@ -45,7 +49,7 @@ export async function GET() {
         const localProducts = JSON.parse(data)
         
         // Convert to database format quickly
-        const products = localProducts.map((p: any, index: number) => ({
+        const products = localProducts.map((p: Record<string, any>, index: number) => ({
           id: index + 1,
           name: p.name,
           category: p.category,

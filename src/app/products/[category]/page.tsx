@@ -1,9 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import GoogleSheetsClient, { Product } from '@/lib/googleSheetsClient'
 
 interface PageProps {
   params: Promise<{

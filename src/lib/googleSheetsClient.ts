@@ -47,7 +47,7 @@ class GoogleSheetsClient {
       }
 
       // Convert spreadsheet rows to Product objects
-      const products: Product[] = values.map((row: any[]) => {
+      const products: Product[] = values.map((row: string[]) => {
         // Expected columns: id, name, category, description, price, condition, year, make, model, images, contactPhone, contactEmail, lastUpdated
         return {
           id: row[0] || '',

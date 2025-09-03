@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { notFound } from 'next/navigation'
 import ImageGallery from '@/components/ImageGallery'
 
 interface Product {

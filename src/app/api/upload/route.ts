@@ -3,11 +3,13 @@ import fs from 'fs'
 import path from 'path'
 
 // Try to import Vercel Blob, but fall back to local storage if not available
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let put: any = null
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const vercelBlob = require('@vercel/blob')
   put = vercelBlob.put
-} catch (error) {
+} catch {
   console.log('Vercel Blob not available, using local storage')
 }
 
