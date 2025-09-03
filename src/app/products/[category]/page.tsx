@@ -1,30 +1,9 @@
-import fs from 'fs'
-import path from 'path'
+'use client'
 
-export async function generateStaticParams() {
-  const productsDir = path.join(process.cwd(), 'public', 'products')
-  const categories = fs.readdirSync(productsDir)
-  let params: { category: string; product: string }[] = []
-
-  for (const category of categories) {
-    const categoryDir = path.join(productsDir, category)
-    if (!fs.statSync(categoryDir).isDirectory()) continue
-    const products = fs.readdirSync(categoryDir)
-    for (const product of products) {
-      const productDir = path.join(categoryDir, product)
-      if (fs.statSync(productDir).isDirectory()) {
-        params.push({ category, product })
-      }
-    }
-  }
-  return params
-}
-
+import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-
-// Validate category parameter
-const validCategories = ['snowmobiles', 'trailers']
+import GoogleSheetsClient, { Product } from '@/lib/googleSheetsClient'
 
 interface PageProps {
   params: Promise<{
@@ -32,71 +11,108 @@ interface PageProps {
   }>
 }
 
-export default async function ProductCategoryPage({ params }: PageProps) {
-  const { category } = await params
+export default function ProductCategoryPage({ params }: PageProps) {
+  const [category, setCategory] = useState<string>('')
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  if (!validCategories.includes(category)) {
-    notFound()
-  }
-
-  // Function to get product folders
-  const getProductFolders = () => {
-    const productsPath = path.join(process.cwd(), 'public', 'products', category)
-    
-    try {
-      return fs.readdirSync(productsPath)
-        .filter(item => {
-          const itemPath = path.join(productsPath, item)
-          return fs.statSync(itemPath).isDirectory()
-        })
-    } catch (error) {
-      console.error('Error reading product folders:', error)
-      return []
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const resolvedParams = await params
+        const { category: categoryParam } = resolvedParams
+        
+        setCategory(categoryParam)
+        
+        const sheetsClient = new GoogleSheetsClient()
+        const categoryProducts = await sheetsClient.getProductsByCategory(categoryParam)
+        setProducts(categoryProducts)
+      } catch (err) {
+        console.error('Error loading products:', err)
+        setError('Failed to load products')
+      } finally {
+        setLoading(false)
+      }
     }
+
+    loadData()
+  }, [params])
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse">
+          <div className="h-10 bg-gray-200 rounded mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-gray-200 rounded-lg h-64"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  // Get all product folders
-  const products = getProductFolders()
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Products</h1>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="p-8">
+        <h1 className="text-4xl font-bold mb-8 capitalize">{category}</h1>
+        <div className="text-center py-12">
+          <p className="text-gray-600 text-lg">No products found in this category.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8">
       <h1 className="text-4xl font-bold mb-8 capitalize">{category}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map((productFolder) => {
-          // Get the first image as the main image
-          const productPath = path.join(process.cwd(), 'public', 'products', category, productFolder)
-          let mainImage = ''
-          
-          try {
-            const files = fs.readdirSync(productPath)
-            const imageFile = files.find(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-            if (imageFile) {
-              mainImage = `/products/${category}/${productFolder}/${imageFile}`
-            }
-          } catch (error) {
-            console.error('Error reading product images:', error)
-          }
+        {products.map((product) => {
+          const mainImage = product.images.length > 0 ? product.images[0] : ''
 
           return (
             <Link
-              key={productFolder}
-              href={`/products/${category}/${productFolder}`}
+              key={product.id}
+              href={`/products/${category}/${product.id}`}
               className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all"
             >
               <div className="aspect-video bg-gray-100 relative">
                 {mainImage && (
                   <img
                     src={mainImage}
-                    alt={productFolder}
+                    alt={product.name}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
               </div>
               <div className="p-4 bg-white">
                 <h2 className="text-xl font-semibold capitalize">
-                  {productFolder.replace(/-/g, ' ')}
+                  {product.name}
                 </h2>
+                {product.price && (
+                  <p className="text-lg font-medium text-green-600 mt-2">
+                    {new GoogleSheetsClient().formatPrice(product.price)}
+                  </p>
+                )}
+                {product.year && product.make && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {product.year} {product.make}
+                  </p>
+                )}
               </div>
             </Link>
           )

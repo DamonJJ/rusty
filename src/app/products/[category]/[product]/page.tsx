@@ -1,28 +1,24 @@
-import fs from 'fs'
-import path from 'path'
+'use client'
 
-// This function is required for static export!
-export async function generateStaticParams() {
-  const productsDir = path.join(process.cwd(), 'public', 'products')
-  const categories = fs.readdirSync(productsDir)
-  let params: { category: string; product: string }[] = []
-
-  for (const category of categories) {
-    const categoryDir = path.join(productsDir, category)
-    if (!fs.statSync(categoryDir).isDirectory()) continue
-    const products = fs.readdirSync(categoryDir)
-    for (const product of products) {
-      const productDir = path.join(categoryDir, product)
-      if (fs.statSync(productDir).isDirectory()) {
-        params.push({ category, product })
-      }
-    }
-  }
-  return params
-}
-
+import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import ImageGallery from '@/components/ImageGallery'
+
+interface Product {
+  id: string
+  name: string
+  category: string
+  description?: string
+  price?: string
+  condition?: string
+  year?: string
+  make?: string
+  model?: string
+  images: string[]
+  contactPhone: string
+  contactEmail: string
+  lastUpdated: string
+}
 
 interface PageProps {
   params: Promise<{
@@ -31,44 +27,101 @@ interface PageProps {
   }>
 }
 
-export default async function ProductPage({ params }: PageProps) {
-  const { category, product } = await params
-  
-  // Validate category
-  const productsDir = path.join(process.cwd(), 'public', 'products')
-  const validCategories = fs.readdirSync(productsDir).filter((file) => {
-    return fs.statSync(path.join(productsDir, file)).isDirectory()
-  })
-  if (!validCategories.includes(category)) {
-    notFound()
+export default function ProductPage({ params }: PageProps) {
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const resolvedParams = await params
+        const { product: productId } = resolvedParams
+        
+        // Fetch product from our API using numeric ID
+        const response = await fetch(`/api/products/${productId}`)
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Product not found')
+          } else {
+            setError('Failed to load product data')
+          }
+          return
+        }
+        
+        const productData = await response.json()
+        
+        // Convert database format to component format
+        const product: Product = {
+          id: productData.id.toString(),
+          name: productData.name,
+          category: productData.category,
+          description: productData.description,
+          price: productData.price?.toString(),
+          condition: productData.condition,
+          year: productData.year?.toString(),
+          make: productData.make,
+          model: productData.model,
+          images: productData.images || [],
+          contactPhone: productData.contact_phone,
+          contactEmail: productData.contact_email,
+          lastUpdated: productData.updated_at
+        }
+        
+        setProduct(product)
+      } catch (err) {
+        console.error('Error loading product:', err)
+        setError('Failed to load product data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [params])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen p-8 bg-[#f8f5f1]">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-10 bg-gray-200 rounded mb-8"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-gray-200 rounded-lg h-96"></div>
+              <div className="space-y-6">
+                <div className="bg-gray-200 rounded-lg h-64"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  // Get product images
-  const productPath = path.join(process.cwd(), 'public', 'products', category, product)
-  let images: { src: string; alt: string }[] = []
- 
-  try {
-    const files = fs.readdirSync(productPath)
-    images = files
-      .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-      .map(file => ({
-        src: `/products/${category}/${product}/${file}`,
-        alt: file.replace(/\.[^/.]+$/, '').replace(/-/g, ' ')
-      }))
-  } catch (error) {
-    console.error('Error reading product images:', error)
-    notFound()
+  if (error || !product) {
+    return (
+      <div className="min-h-screen p-8 bg-[#f8f5f1]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Product</h1>
+            <p className="text-gray-600">{error || 'Product not found'}</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  if (images.length === 0) {
-    notFound()
-  }
+  const images = product.images.map((src, index) => ({
+    src,
+    alt: `${product.name} - Image ${index + 1}`
+  }))
 
   return (
     <div className="min-h-screen p-8 bg-[#f8f5f1]">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 capitalize text-amber-900 rustic-header font-serif">
-          {product.replace(/-/g, ' ')}
+          {product.name}
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -84,9 +137,45 @@ export default async function ProductPage({ params }: PageProps) {
               
               {/* Product Information */}
               <div className="space-y-4 mb-6">
-                <p className="text-amber-800/80">
-                  Contact us for more information about this {category.slice(0, -1)}.
-                </p>
+                {product.description && (
+                  <p className="text-amber-800/80">{product.description}</p>
+                )}
+                
+                {/* Product Specifications */}
+                <div className="grid grid-cols-2 gap-4">
+                  {product.price && (
+                    <div>
+                      <span className="font-medium text-amber-900">Price:</span>
+                      <p className="text-lg font-bold text-green-600">
+                        ${parseFloat(product.price || '0').toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  {product.condition && (
+                    <div>
+                      <span className="font-medium text-amber-900">Condition:</span>
+                      <p className="text-amber-800/80">{product.condition}</p>
+                    </div>
+                  )}
+                  {product.year && (
+                    <div>
+                      <span className="font-medium text-amber-900">Year:</span>
+                      <p className="text-amber-800/80">{product.year}</p>
+                    </div>
+                  )}
+                  {product.make && (
+                    <div>
+                      <span className="font-medium text-amber-900">Make:</span>
+                      <p className="text-amber-800/80">{product.make}</p>
+                    </div>
+                  )}
+                  {product.model && (
+                    <div>
+                      <span className="font-medium text-amber-900">Model:</span>
+                      <p className="text-amber-800/80">{product.model}</p>
+                    </div>
+                  )}
+                </div>
                 
                 {/* Contact Information */}
                 <div className="border-t border-amber-900/10 pt-4">
@@ -96,13 +185,13 @@ export default async function ProductPage({ params }: PageProps) {
                       <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span>(715) 430-2201</span>
+                      <span>{product.contactPhone}</span>
                     </p>
                     <p className="flex items-center gap-2">
                       <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>vern@rustynuts.repair</span>
+                      <span>{product.contactEmail}</span>
                     </p>
                     <p className="flex items-center gap-2">
                       <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,13 +206,13 @@ export default async function ProductPage({ params }: PageProps) {
               {/* Contact Buttons */}
               <div className="space-y-3">
                 <a 
-                  href="tel:7154302201"
+                  href={`tel:${product.contactPhone.replace(/\D/g, '')}`}
                   className="block w-full py-3 px-6 text-center rounded-lg bg-amber-900 text-white hover:bg-amber-800 transition-colors font-medium"
                 >
-                  Call Now: (715) 430-2201
+                  Call Now: {product.contactPhone}
                 </a>
                 <a 
-                  href={`mailto:vern@rustynuts.repair?subject=Inquiry about ${product}`}
+                  href={`mailto:${product.contactEmail}?subject=Inquiry about ${product.name}`}
                   className="block w-full py-3 px-6 text-center rounded-lg border-2 border-amber-900 text-amber-900 hover:bg-amber-900/5 transition-colors font-medium"
                 >
                   Send Email

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import fs from 'fs'
 import path from 'path'
 
-// Function to get all products from the public/products directory
+// Function to get all products from the JSON database
 type Product = {
   id: string;
   name: string;
@@ -16,6 +16,43 @@ type ProductsByCategory = {
 
 function getAllProductsByCategory(): ProductsByCategory {
   const productsByCategory: ProductsByCategory = {};
+  
+  try {
+    // Read from JSON database first
+    const jsonPath = path.join(process.cwd(), 'public', 'data', 'products.json');
+    
+    if (fs.existsSync(jsonPath)) {
+      const data = fs.readFileSync(jsonPath, 'utf8');
+      const products = JSON.parse(data);
+      
+      // Group products by category
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        const category = product.category;
+        if (!productsByCategory[category]) {
+          productsByCategory[category] = [];
+        }
+        
+        // Use first image as main image, fallback to placeholder
+        const mainImage = product.images && product.images.length > 0 
+          ? product.images[0] 
+          : '/placeholder-product.jpg';
+        
+        // Use index + 1 as numeric ID to match what the API expects
+        productsByCategory[category].push({
+          id: (i + 1).toString(),
+          name: product.name,
+          mainImage: mainImage,
+        });
+      }
+      
+      return productsByCategory;
+    }
+  } catch (error) {
+    console.error('Error reading JSON database:', error);
+  }
+
+  // Fallback to original file system method if JSON doesn't exist
   const productsPath = path.join(process.cwd(), 'public', 'products');
 
   try {
@@ -29,7 +66,10 @@ function getAllProductsByCategory(): ProductsByCategory {
       const productFolders = fs.readdirSync(categoryPath)
         .filter(item => fs.statSync(path.join(categoryPath, item)).isDirectory());
 
-      productsByCategory[category] = [];
+      if (!productsByCategory[category]) {
+        productsByCategory[category] = [];
+      }
+      
       for (const productFolder of productFolders) {
         const productPath = path.join(categoryPath, productFolder);
         // Get the first image as the main image
@@ -45,7 +85,7 @@ function getAllProductsByCategory(): ProductsByCategory {
       }
     }
   } catch (error) {
-    console.error('Error reading products:', error);
+    console.error('Error reading products from filesystem:', error);
   }
 
   return productsByCategory;
@@ -73,6 +113,16 @@ export default function Home() {
           Small Engine Repair
         </p>
         <div className="h-1 w-40 bg-amber-900/20 mx-auto"></div>
+        
+        {/* Admin Link */}
+        <div className="mt-8">
+          <Link
+            href="/admin"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-amber-700 bg-amber-100 rounded-md hover:bg-amber-200 transition-colors"
+          >
+            Admin Panel
+          </Link>
+        </div>
       </div>
 
       {/* Products by Category Section */}

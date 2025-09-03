@@ -1,0 +1,107 @@
+[
+  {
+    "id": "snowmobile-1",
+    "name": "Arctic Cat Snowmobile",
+    "category": "snowmobiles",
+    "description": "Excellent condition Arctic Cat snowmobile, perfect for winter adventures.",
+    "price": "8500",
+    "condition": "Excellent",
+    "year": "2020",
+    "make": "Arctic Cat",
+    "model": "ZR 6000",
+    "images": [
+      "/products/snowmobiles/snowmobile-1/snowmobile-1.JPG",
+      "/products/snowmobiles/snowmobile-1/snowmobile-2.JPG",
+      "/products/snowmobiles/snowmobile-1/snowmobile-3.JPG",
+      "/products/snowmobiles/snowmobile-1/snowmobile-4.JPG",
+      "/products/snowmobiles/snowmobile-1/snowmobile-5.JPG"
+    ],
+    "contactPhone": "(715) 430-2201",
+    "contactEmail": "vern@rustynuts.repair",
+    "lastUpdated": "2024-01-15"
+  },
+  {
+    "id": "snowmobile-2",
+    "name": "Polaris Snowmobile",
+    "category": "snowmobiles",
+    "description": "High-performance Polaris snowmobile with advanced features.",
+    "price": "9200",
+    "condition": "Very Good",
+    "year": "2019",
+    "make": "Polaris",
+    "model": "Indy 850",
+    "images": [
+      "/products/snowmobiles/snowmobile-2/snowmobile2-1.JPG",
+      "/products/snowmobiles/snowmobile-2/snowmobile2-2.JPG",
+      "/products/snowmobiles/snowmobile-2/snowmobile2-3.JPG",
+      "/products/snowmobiles/snowmobile-2/snowmobile2-4.JPG"
+    ],
+    "contactPhone": "(715) 430-2201",
+    "contactEmail": "vern@rustynuts.repair",
+    "lastUpdated": "2024-01-15"
+  },
+  {
+    "id": "trailer-1",
+    "name": "Utility Trailer",
+    "category": "trailers",
+    "description": "Heavy-duty utility trailer perfect for hauling equipment and materials.",
+    "price": "3500",
+    "condition": "Good",
+    "year": "2018",
+    "make": "Custom",
+    "model": "Utility",
+    "images": [
+      "/products/trailers/trailer-1/trailer-1.JPG",
+      "/products/trailers/trailer-1/trailer-2.JPG",
+      "/products/trailers/trailer-1/trailer-3.JPG",
+      "/products/trailers/trailer-1/trailer-4.JPG",
+      "/products/trailers/trailer-1/trailer-5.JPG",
+      "/products/trailers/trailer-1/trailer-6.JPG",
+      "/products/trailers/trailer-1/trailer-7.JPG",
+      "/products/trailers/trailer-1/trailer-8.JPG",
+      "/products/trailers/trailer-1/trailer-9.JPG",
+      "/products/trailers/trailer-1/trailer-10.JPG",
+      "/products/trailers/trailer-1/trailer-11.JPG"
+    ],
+    "contactPhone": "(715) 430-2201",
+    "contactEmail": "vern@rustynuts.repair",
+    "lastUpdated": "2024-01-15"
+  },
+  {
+    "id": "lawnmower-1",
+    "name": "Commercial Lawn Mower",
+    "category": "lawnmowers",
+    "description": "Professional grade commercial lawn mower for large properties.",
+    "price": "2800",
+    "condition": "Excellent",
+    "year": "2021",
+    "make": "Honda",
+    "model": "Commercial",
+    "images": [
+      "/products/lawnmowers/lawnmower-1/lawnmower-1.jpg",
+      "/products/lawnmowers/lawnmower-1/lawnmower-2.jpg",
+      "/products/lawnmowers/lawnmower-1/lawnmower-3.jpg",
+      "/products/lawnmowers/lawnmower-1/lawnmower-4.jpg"
+    ],
+    "contactPhone": "(715) 430-2201",
+    "contactEmail": "vern@rustynuts.repair",
+    "lastUpdated": "2024-01-15"
+  },
+  {
+    "id": "NaN",
+    "name": "Test Product",
+    "category": "snowmobiles",
+    "description": "Test",
+    "price": "5000",
+    "condition": "Excellent",
+    "year": "1990",
+    "make": "test",
+    "model": "test",
+    "images": [
+      "/uploads/1756922100985-shipping_lifestyle_desktop.webp"
+    ],
+    "contactPhone": "(715) 430-2201",
+    "contactEmail": "vern@rustynuts.repair",
+    "lastUpdated": "2025-09-03T17:55:04.288Z"
+  }
+]

@@ -6,10 +6,12 @@
     "dev": "next dev --port 3060",
     "build": "next build",
     "start": "next start",
-    "export": "next export",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel-build": "next build"
   },
   "dependencies": {
+    "@vercel/blob": "^1.1.1",
+    "@vercel/postgres": "^0.10.0",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

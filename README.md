@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rusty Nuts Repair - Product Showcase
+
+A Next.js product showcase website for Rusty Nuts Repair, featuring dynamic product management through Google Sheets integration.
+
+## Features
+
+- **Dynamic Product Management**: Products are managed through Google Sheets, allowing non-technical users to update inventory
+- **Automatic Updates**: Product changes in the spreadsheet automatically reflect on the website
+- **Fallback System**: Graceful fallback to static JSON if Google Sheets API is unavailable
+- **Rich Product Information**: Detailed product pages with images, descriptions, pricing, and specifications
+- **Category Organization**: Products organized by categories (snowmobiles, trailers, lawnmowers)
+- **Responsive Design**: Mobile-friendly interface with modern styling
+- **Admin Dashboard**: Built-in admin panel to monitor system status and product inventory
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- Google Sheets API access
+- Google Cloud Console account
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set up environment variables (see [Google Sheets Setup Guide](./GOOGLE_SHEETS_SETUP.md)):
+```bash
+NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY=your-api-key-here
+NEXT_PUBLIC_PRODUCTS_SPREADSHEET_ID=your-spreadsheet-id-here
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. Open [http://localhost:3060](http://localhost:3060) to view the website
 
-## Learn More
+### Admin Access
 
-To learn more about Next.js, take a look at the following resources:
+Visit `/admin` to access the product management dashboard and monitor system status.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Product Management
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Adding Products
 
-## Deploy on Vercel
+1. Add a new row to your Google Sheets spreadsheet
+2. Fill in required fields (ID, Name, Category)
+3. Add image paths (comma-separated)
+4. Save the spreadsheet
+5. Refresh the website to see changes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Image Management
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Upload images to `public/products/[category]/[product-id]/`
+- Reference images in the spreadsheet using full paths
+- Multiple images can be separated by commas
+
+## Deployment
+
+This application is designed to work with static hosting providers:
+
+```bash
+npm run build
+npm run export
+```
+
+The exported files can be deployed to any static hosting service.
+
+## Documentation
+
+- [Google Sheets Setup Guide](./GOOGLE_SHEETS_SETUP.md) - Complete setup instructions
+- [Admin Dashboard](./src/app/admin/page.tsx) - Product management interface
+
+## Technology Stack
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Data Source**: Google Sheets API
+- **Fallback**: Static JSON
+
+## Support
+
+For setup assistance or questions about the Google Sheets integration, refer to the [setup guide](./GOOGLE_SHEETS_SETUP.md).
