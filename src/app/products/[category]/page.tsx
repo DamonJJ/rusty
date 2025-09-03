@@ -48,8 +48,8 @@ export default function ProductCategoryPage({ params }: PageProps) {
         const allProducts = await response.json()
         
         // Filter products by category and convert to component format
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const categoryProducts = allProducts
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .filter((p: any) => p.category === categoryParam)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .map((p: any) => ({
