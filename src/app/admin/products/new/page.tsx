@@ -46,7 +46,8 @@ export default function NewProductPage() {
         setShowCustomCategory(true)
         setFormData(prev => ({ ...prev, category: '' }))
         return
-      } else {
+      } else if (!showCustomCategory) {
+        // Only hide custom category if we're not already in custom mode
         setShowCustomCategory(false)
       }
     }
