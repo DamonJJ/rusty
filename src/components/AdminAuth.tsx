@@ -90,12 +90,6 @@ export default function AdminAuth({ children }: AdminAuthProps) {
               </button>
             </div>
           </form>
-          
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500">
-              For demo purposes, the password is: <code className="bg-gray-100 px-1 rounded">rusty2024!</code>
-            </p>
-          </div>
         </div>
       </div>
     )
