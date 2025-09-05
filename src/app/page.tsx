@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import fs from 'fs'
-import path from 'path'
 
-// Function to get all products from the JSON database
+// Database product type
+type DatabaseProduct = {
+  id: number;
+  name: string;
+  category: string;
+  images: string[];
+};
+
+// Homepage product type
 type Product = {
   id: string;
   name: string;
@@ -14,20 +20,26 @@ type ProductsByCategory = {
   [category: string]: Product[];
 };
 
-function getAllProductsByCategory(): ProductsByCategory {
+// Fetch products from the API (which connects to database)
+async function getAllProductsByCategory(): Promise<ProductsByCategory> {
   const productsByCategory: ProductsByCategory = {};
   
   try {
-    // Read from JSON database first
-    const jsonPath = path.join(process.cwd(), 'public', 'data', 'products.json');
+    // Use absolute URL for server-side fetching
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3060';
     
-    if (fs.existsSync(jsonPath)) {
-      const data = fs.readFileSync(jsonPath, 'utf8');
-      const products = JSON.parse(data);
+    const response = await fetch(`${baseUrl}/api/products`, {
+      // Disable caching to always get fresh data
+      cache: 'no-store'
+    });
+    
+    if (response.ok) {
+      const products: DatabaseProduct[] = await response.json();
       
       // Group products by category
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
+      for (const product of products) {
         const category = product.category;
         if (!productsByCategory[category]) {
           productsByCategory[category] = [];
@@ -38,9 +50,8 @@ function getAllProductsByCategory(): ProductsByCategory {
           ? product.images[0] 
           : '/placeholder-product.jpg';
         
-        // Use index + 1 as numeric ID to match what the API expects
         productsByCategory[category].push({
-          id: (i + 1).toString(),
+          id: product.id.toString(),
           name: product.name,
           mainImage: mainImage,
         });
@@ -49,50 +60,15 @@ function getAllProductsByCategory(): ProductsByCategory {
       return productsByCategory;
     }
   } catch (error) {
-    console.error('Error reading JSON database:', error);
+    console.error('Error fetching products from API:', error);
   }
 
-  // Fallback to original file system method if JSON doesn't exist
-  const productsPath = path.join(process.cwd(), 'public', 'products');
-
-  try {
-    // Get all category folders
-    const categories = fs.readdirSync(productsPath);
-
-    for (const category of categories) {
-      const categoryPath = path.join(productsPath, category);
-      if (!fs.statSync(categoryPath).isDirectory()) continue;
-      // Get all product folders in this category
-      const productFolders = fs.readdirSync(categoryPath)
-        .filter(item => fs.statSync(path.join(categoryPath, item)).isDirectory());
-
-      if (!productsByCategory[category]) {
-        productsByCategory[category] = [];
-      }
-      
-      for (const productFolder of productFolders) {
-        const productPath = path.join(categoryPath, productFolder);
-        // Get the first image as the main image
-        const files = fs.readdirSync(productPath);
-        const mainImage = files.find(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
-        if (mainImage) {
-          productsByCategory[category].push({
-            id: productFolder,
-            name: productFolder.replace(/-/g, ' '),
-            mainImage: `/products/${category}/${productFolder}/${mainImage}`,
-          });
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error reading products from filesystem:', error);
-  }
-
+  // Fallback: return empty object if API fails
   return productsByCategory;
 }
 
-export default function Home() {
-  const productsByCategory = getAllProductsByCategory();
+export default async function Home() {
+  const productsByCategory = await getAllProductsByCategory();
   const categories = Object.keys(productsByCategory);
 
   return (
