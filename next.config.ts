@@ -4,6 +4,14 @@ const nextConfig: NextConfig = {
   // Configuration for Vercel deployment with dynamic features
   images: {
     domains: ['vercel.app', 'vercel.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     unoptimized: false,
   },
   
