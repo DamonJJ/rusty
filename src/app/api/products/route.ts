@@ -23,6 +23,7 @@ export async function GET() {
       `
       
       // Parse images arrays from PostgreSQL JSON strings
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const processedRows = rows.map((row: any) => ({
         ...row,
         images: Array.isArray(row.images) ? row.images : (row.images || [])
