@@ -45,6 +45,7 @@ export default function EditProductPage() {
   const [fetching, setFetching] = useState(true)
   const [images, setImages] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [showCustomCategory, setShowCustomCategory] = useState(false)
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     category: '',
@@ -98,6 +99,18 @@ export default function EditProductPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
+    
+    // Handle category selection
+    if (name === 'category') {
+      if (value === 'custom') {
+        setShowCustomCategory(true)
+        setFormData(prev => ({ ...prev, category: '' }))
+        return
+      } else {
+        setShowCustomCategory(false)
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -254,18 +267,47 @@ export default function EditProductPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Category</option>
-                <option value="snowmobiles">Snowmobiles</option>
-                <option value="trailers">Trailers</option>
-                <option value="lawnmowers">Lawnmowers</option>
-              </select>
+              {!showCustomCategory ? (
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Category</option>
+                  <option value="snowmobiles">Snowmobiles</option>
+                  <option value="trailers">Trailers</option>
+                  <option value="lawnmowers">Lawnmowers</option>
+                  <option value="atvs">ATVs</option>
+                  <option value="boats">Boats</option>
+                  <option value="motorcycles">Motorcycles</option>
+                  <option value="generators">Generators</option>
+                  <option value="custom">+ Create New Category</option>
+                </select>
+              ) : (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter new category name (e.g., 'chainsaws')"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomCategory(false)
+                      setFormData(prev => ({ ...prev, category: '' }))
+                    }}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    ← Back to existing categories
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="md:col-span-2">

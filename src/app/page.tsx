@@ -133,16 +133,6 @@ export default function Home() {
           Small Engine Repair
         </p>
         <div className="h-1 w-40 bg-amber-900/20 mx-auto"></div>
-        
-        {/* Admin Link */}
-        <div className="mt-8">
-          <Link
-            href="/admin"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-amber-700 bg-amber-100 rounded-md hover:bg-amber-200 transition-colors"
-          >
-            Admin Panel
-          </Link>
-        </div>
       </div>
 
       {/* Products by Category Section */}
