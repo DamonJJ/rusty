@@ -33,7 +33,13 @@ export async function GET(
         )
       }
 
-      return NextResponse.json(rows[0])
+      // Parse images array from PostgreSQL JSON string
+      const product = {
+        ...rows[0],
+        images: Array.isArray(rows[0].images) ? rows[0].images : (rows[0].images || [])
+      }
+
+      return NextResponse.json(product)
     } catch (error) {
       console.error('Database error, falling back to local:', error)
     }

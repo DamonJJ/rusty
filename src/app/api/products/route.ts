@@ -21,7 +21,14 @@ export async function GET() {
         SELECT * FROM products 
         ORDER BY created_at DESC
       `
-      return NextResponse.json(rows)
+      
+      // Parse images arrays from PostgreSQL JSON strings
+      const processedRows = rows.map((row: any) => ({
+        ...row,
+        images: Array.isArray(row.images) ? row.images : (row.images || [])
+      }))
+      
+      return NextResponse.json(processedRows)
     } catch (error) {
       console.error('Database error, falling back to local:', error)
     }
